@@ -1,0 +1,7 @@
+server:
+  port: 8083
+  servlet:
+    contextPath: /cashier
+
+account:
+  getEndpoint: http://localhost:8082/account/search/{accountNumber}
