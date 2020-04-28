@@ -4,8 +4,6 @@ import com.service.cashier.helper.CustomResponse;
 import com.service.cashier.helper.SpringIntegration;
 import com.service.cashier.helper.TestContextInterface;
 import com.service.cashier.model.TransactionVO;
-import io.cucumber.java.After;
-import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -23,15 +21,6 @@ public class CashierStepDefinition extends SpringIntegration implements En, Test
 
     private ResponseEntity responseEntity;
 
-    @Before
-    public void doSomethingBefore() {
-        setUpKafkaEmbed();
-    }
-
-    @After
-    public void remove(){
-        tearDown();
-    }
     @Given("Customer provides a valid account number and transaction details")
     public void customer_provides_a_valid_account_number_and_transaction_details() {
         startService();
@@ -56,7 +45,6 @@ public class CashierStepDefinition extends SpringIntegration implements En, Test
     public void the_API_should_return_status(Integer statusCode) {
         assertEquals(HttpStatus.CREATED.value(), responseEntity.getStatusCodeValue());
         stopService();
-        tearDown();
     }
 
     @Override

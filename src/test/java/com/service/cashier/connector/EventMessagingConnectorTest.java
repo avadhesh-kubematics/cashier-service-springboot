@@ -2,7 +2,9 @@ package com.service.cashier.connector;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.util.concurrent.ListenableFuture;
 
 import static com.service.cashier.helper.TestData.getCreditTransaction;
 import static org.mockito.Mockito.*;

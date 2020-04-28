@@ -34,6 +34,8 @@ public class EventMessagingConnector {
 
             @Override
             public void onFailure(Throwable ex) {
+                log.error("EventMessagingConnector:produceEventMessage : Unable to send message : {} due to : {}",
+                        transactionVO, ex.getMessage());
                 System.out.println("Unable to send message=[" + transactionVO + "] due to : " + ex.getMessage());
             }
         });
