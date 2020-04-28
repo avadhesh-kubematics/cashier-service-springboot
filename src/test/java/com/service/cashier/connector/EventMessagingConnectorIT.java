@@ -83,10 +83,10 @@ public class EventMessagingConnectorIT {
     }
 
     @Test
-    public void it_should_send_updated_brand_event() throws InterruptedException, IOException {
+    public void produceEventMessage_shouldReceiveAnEvent_whenAnMessagingEventIsSent() throws InterruptedException, IOException {
         eventMessagingConnector.produceEventMessage(getCreditTransaction());
-        ConsumerRecord<String, String> received = consumerRecords.poll(10, TimeUnit.SECONDS);
 
+        ConsumerRecord<String, String> received = consumerRecords.poll(10, TimeUnit.SECONDS);
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(getCreditTransaction());
 
