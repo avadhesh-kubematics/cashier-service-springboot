@@ -17,12 +17,13 @@ class EventMessagingConnectorTest {
 
     @BeforeEach
     void setUp() {
-
         eventMessagingConnector = new EventMessagingConnector(mockKafkaTemplate, MOCK_TOPIC_NAME);
     }
 
     @Test
     void produceEventMessage_shouldCallTheKafkaTemplate_whenTransactionVOIsPassed() {
+        when(mockKafkaTemplate.send(MOCK_TOPIC_NAME, getCreditTransaction())).thenReturn(mock(ListenableFuture.class));
+
         eventMessagingConnector.produceEventMessage(getCreditTransaction());
 
         verify(mockKafkaTemplate, times(1))
