@@ -1,7 +1,7 @@
 package com.service.cashier.service;
 
 import com.service.cashier.connector.AccountConnector;
-import com.service.cashier.connector.QueueConnector;
+import com.service.cashier.connector.EventMessagingConnector;
 import com.service.cashier.model.TransactionVO;
 import org.springframework.stereotype.Service;
 
@@ -9,15 +9,15 @@ import org.springframework.stereotype.Service;
 public class CashierService {
 
     private AccountConnector accountConnector;
-    private QueueConnector queueConnector;
+    private EventMessagingConnector eventMessagingConnector;
 
-    public CashierService(AccountConnector accountConnector, QueueConnector queueConnector) {
+    public CashierService(AccountConnector accountConnector, EventMessagingConnector eventMessagingConnector) {
         this.accountConnector = accountConnector;
-        this.queueConnector = queueConnector;
+        this.eventMessagingConnector = eventMessagingConnector;
     }
 
     public void create(TransactionVO transaction) {
         this.accountConnector.invokeAccountService(transaction.getAccountNumber());
-        this.queueConnector.callQueueService(transaction);
+        this.eventMessagingConnector.produceEventMessage(transaction);
     }
 }

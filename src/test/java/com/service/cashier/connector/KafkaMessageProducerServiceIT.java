@@ -1,10 +1,16 @@
-package com.service.cashier.helper;
+package com.service.cashier.connector;
 
-import com.service.cashier.CashierApplication;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.service.cashier.model.TransactionVO;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
@@ -13,25 +19,34 @@ import org.springframework.kafka.listener.MessageListener;
 import org.springframework.kafka.test.rule.EmbeddedKafkaRule;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
-@SpringBootTest(
-        classes = CashierApplication.class,
-        webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@ActiveProfiles("test")
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThat;
+import static org.springframework.kafka.test.assertj.KafkaConditions.key;
+import static org.springframework.kafka.test.hamcrest.KafkaMatchers.hasValue;
+
+
 @RunWith(SpringRunner.class)
-public abstract class SpringIntegration {
-    protected static final String DEFAULT_URL = "http://localhost:7093/cashier/create";
+@DirtiesContext
+@SpringBootTest()
+@ActiveProfiles("test")
+public class  KafkaMessageProducerServiceIT {
 
-    protected RestTemplate restTemplate = new RestTemplate();
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaMessageProducerServiceIT.class);
 
-    private static String TOPIC_NAME = "transaction";
+    private static String TOPIC_NAME = "UpdatedBrandEvent";
+
+    @Autowired
+    private KafkaMessageProducerService kafkaMessageProducerService;
 
     private KafkaMessageListenerContainer<String, TransactionVO> container;
 
@@ -40,7 +55,8 @@ public abstract class SpringIntegration {
     @ClassRule
     public static EmbeddedKafkaRule embeddedKafka = new EmbeddedKafkaRule(1, true, TOPIC_NAME);
 
-    public BlockingQueue<ConsumerRecord<String, String>> setUpKafkaEmbed() {
+    @Before
+    public void setUp() {
         consumerRecords = new LinkedBlockingQueue<>();
 
         ContainerProperties containerProperties = new ContainerProperties(TOPIC_NAME);
@@ -52,16 +68,33 @@ public abstract class SpringIntegration {
 
         container = new KafkaMessageListenerContainer<>(consumer, containerProperties);
         container.setupMessageListener((MessageListener<String, String>) record -> {
-            System.out.println("Listened message='{}'" + record.toString());
+            LOGGER.debug("Listened message='{}'", record.toString());
             consumerRecords.add(record);
         });
         container.start();
 
         ContainerTestUtils.waitForAssignment(container, embeddedKafka.getEmbeddedKafka().getPartitionsPerTopic());
-        return consumerRecords;
     }
 
+    @After
     public void tearDown() {
         container.stop();
     }
+
+    @Test
+    public void it_should_send_updated_brand_event() throws InterruptedException, IOException {
+        TransactionVO updatedBrandEvent = new TransactionVO();
+        updatedBrandEvent.setTransactionType("credit");
+        kafkaMessageProducerService.send(updatedBrandEvent);
+
+        ConsumerRecord<String, String> received = consumerRecords.poll(10, TimeUnit.SECONDS);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString( updatedBrandEvent );
+
+        assertThat(received, hasValue(json));
+
+        assertThat(received).has(key(null));
+    }
+
 }

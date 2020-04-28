@@ -1,7 +1,21 @@
 server:
-  port: 9093
+  port: 7083
   servlet:
     contextPath: /cashier
 
 account:
-  getEndpoint: http://localhost:8005/account/search/{accountNumber}
+  getEndpoint: http://localhost:8082/account/search/{accountNumber}
+
+kafka:
+#  bootstrapAddress: ${spring.embedded.kafka.brokers}
+  bootstrapAddress: dummy:9092
+  topicName: transaction
+
+logging:
+  level:
+    org:
+      springframework:
+        web: ERROR
+    com:
+      service:
+        cashier: DEBUG

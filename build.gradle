@@ -34,6 +34,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 //    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     testImplementation('org.springframework.boot:spring-boot-starter-test')
+    compile group: 'org.springframework.kafka', name: 'spring-kafka', version: '2.4.5.RELEASE'
+    testCompile group: 'org.springframework.kafka', name: 'spring-kafka-test', version: '2.2.7.RELEASE'
     // Cucumber Dependencies for BDD
     testImplementation "io.cucumber:cucumber-java:${ioCucumberVersion}"
     testImplementation "io.cucumber:cucumber-junit:${ioCucumberVersion}"
