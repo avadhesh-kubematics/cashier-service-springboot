@@ -11,12 +11,12 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 
 @Slf4j
 @Component
-public class EventMessagingConnector {
+public class EventMessageProducer {
 
     private KafkaTemplate kafkaTemplate;
     private String topicName;
 
-    public EventMessagingConnector(KafkaTemplate kafkaTemplate, @Value("${kafka.topicName}") String topicName) {
+    public EventMessageProducer(KafkaTemplate kafkaTemplate, @Value("${kafka.topicName}") String topicName) {
         this.kafkaTemplate = kafkaTemplate;
         this.topicName = topicName;
     }

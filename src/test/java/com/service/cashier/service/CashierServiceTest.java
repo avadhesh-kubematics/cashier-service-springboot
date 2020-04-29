@@ -1,7 +1,7 @@
 package com.service.cashier.service;
 
 import com.service.cashier.connector.AccountConnector;
-import com.service.cashier.connector.EventMessagingConnector;
+import com.service.cashier.connector.EventMessageProducer;
 import com.service.cashier.model.TransactionVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,15 +13,15 @@ class CashierServiceTest {
 
     private CashierService cashierService;
     private AccountConnector mockAccountConnector;
-    private EventMessagingConnector mockEventMessagingConnector;
+    private EventMessageProducer mockEventMessageProducer;
 
     private
 
     @BeforeEach
     void setUp() {
         mockAccountConnector = mock(AccountConnector.class);
-        mockEventMessagingConnector = mock(EventMessagingConnector.class);
-        cashierService = new CashierService(mockAccountConnector, mockEventMessagingConnector);
+        mockEventMessageProducer = mock(EventMessageProducer.class);
+        cashierService = new CashierService(mockAccountConnector, mockEventMessageProducer);
     }
 
     @Test
@@ -32,7 +32,7 @@ class CashierServiceTest {
 
         verify(mockAccountConnector, times(1)).
                 invokeAccountService(transaction.getAccountNumber());
-        verify(mockEventMessagingConnector, times(1)).
+        verify(mockEventMessageProducer, times(1)).
                 produceEventMessage(transaction);
     }
 }

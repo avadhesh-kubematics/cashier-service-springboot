@@ -40,21 +40,16 @@ import static org.springframework.kafka.test.hamcrest.KafkaMatchers.hasValue;
 @DirtiesContext
 @SpringBootTest
 @ActiveProfiles("test")
-public class EventMessagingConnectorIT {
+public class EventMessageProducerIT {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventMessagingConnectorIT.class);
-
-    @Autowired
-    private EventMessagingConnector eventMessagingConnector;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventMessageProducerIT.class);
     private static String TOPIC_NAME = "transaction";
-
-    private KafkaMessageListenerContainer<String, TransactionVO> container;
-
-    private BlockingQueue<ConsumerRecord<String, String>> consumerRecords;
-
     @ClassRule
     public static EmbeddedKafkaRule embeddedKafka = new EmbeddedKafkaRule(1, true, TOPIC_NAME);
+    @Autowired
+    private EventMessageProducer eventMessageProducer;
+    private KafkaMessageListenerContainer<String, TransactionVO> container;
+    private BlockingQueue<ConsumerRecord<String, String>> consumerRecords;
 
     @Before
     public void setUp() {
@@ -84,7 +79,7 @@ public class EventMessagingConnectorIT {
 
     @Test
     public void produceEventMessage_shouldReceiveAnEvent_whenAnMessagingEventIsSent() throws InterruptedException, IOException {
-        eventMessagingConnector.produceEventMessage(getCreditTransaction());
+        eventMessageProducer.produceEventMessage(getCreditTransaction());
 
         ConsumerRecord<String, String> received = consumerRecords.poll(10, TimeUnit.SECONDS);
         ObjectMapper mapper = new ObjectMapper();
